@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MODI 통합 플랫폼 | 홈</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+        }
+        .nav-item:hover {
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-3">
+                    <img src="../modi(tp).png" alt="Logo" class="h-8 w-auto" onerror="this.src='https://placehold.co/40x40?text=M'">
+                    <span class="text-xl font-black text-indigo-600 tracking-tighter">MODI PLATFORM</span>
+                </div>
+                <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+                    <a href="admin.html" class="hover:text-indigo-600 transition-colors flex items-center gap-1">
+                        <i class="fas fa-lock text-[10px]"></i> 관리자
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main class="flex-grow">
+        <div class="hero-gradient py-20 px-4 text-white">
+            <div class="max-w-5xl mx-auto text-center">
+                <h1 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
+                    MODI 교수학습과정안을<br>한곳에서 관리하세요.
+                </h1>
+                <p class="text-lg md:text-xl text-indigo-100 mb-10 max-w-2xl mx-auto">
+                    작성부터 배포까지, 학교 현장에 최적화된 통합 플랫폼입니다.<br>
+                    보안이 강화된 관리 시스템과 아름다운 갤러리 레이아웃을 경험해 보세요.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="lesson_editor.html" class="bg-white text-indigo-600 px-8 py-4 rounded-2xl font-bold shadow-xl hover:bg-indigo-50 transition-all">
+                        과정안 작성하기
+                    </a>
+                    <a href="project_editor.html" class="bg-white text-indigo-600 px-8 py-4 rounded-2xl font-bold shadow-xl hover:bg-indigo-50 transition-all">
+                        프로젝트 작성하기
+                    </a>
+                    <a href="gallery.html" class="bg-indigo-500/20 text-white border border-indigo-400/30 px-8 py-4 rounded-2xl font-bold backdrop-blur-sm hover:bg-indigo-500/30 transition-all">
+                        갤러리 보기
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="max-w-7xl mx-auto px-4 py-20">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Lesson Plan -->
+                <a href="lesson_editor.html" class="glass-card p-8 rounded-3xl shadow-sm border border-slate-100 nav-item group block">
+                    <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">교수학습과정안</h3>
+                    <p class="text-slate-500 mb-6 leading-relaxed">
+                        단일 차시 수업을 위한 표준 과정안입니다. MODI 4단계(M-O-D-I)와 평가 계획이 포함됩니다.
+                    </p>
+                    <span class="text-blue-600 font-bold flex items-center gap-2 group-hover:gap-3 transition-all">
+                        작성하기 <i class="fas fa-arrow-right"></i>
+                    </span>
+                </a>
+
+                <!-- Project Plan -->
+                <a href="project_editor.html" class="glass-card p-8 rounded-3xl shadow-sm border border-slate-100 nav-item group block">
+                    <div class="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">창의적 체험활동 프로젝트</h3>
+                    <p class="text-slate-500 mb-6 leading-relaxed">
+                        다차시로 구성된 프로젝트 수업을 위한 과정안입니다. 전체 흐름도와 차시별 주요 활동을 관리합니다.
+                    </p>
+                    <span class="text-indigo-600 font-bold flex items-center gap-2 group-hover:gap-3 transition-all">
+                        작성하기 <i class="fas fa-arrow-right"></i>
+                    </span>
+                </a>
+
+                <!-- Gallery -->
+                <a href="gallery.html" class="glass-card p-8 rounded-3xl shadow-sm border border-slate-100 nav-item group block">
+                    <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                        <i class="fas fa-th-large"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">갤러리</h3>
+                    <p class="text-slate-500 mb-6 leading-relaxed">
+                        작성된 결과물을 노션 스타일의 세련된 갤러리로 제공합니다. 학년, 교과별 필터로 필요한 자료를 즉시 찾을 수 있습니다.
+                    </p>
+                    <span class="text-emerald-600 font-bold flex items-center gap-2 group-hover:gap-3 transition-all">
+                        구경하기 <i class="fas fa-arrow-right"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-slate-400 text-sm">
+                &copy; 2026 MODI Lesson Plan Platform. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MODI 통합 플랫폼 | 갤러리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .notion-card:hover {
+            background-color: #f1f5f9;
+            cursor: pointer;
+        }
+        .filter-btn.active {
+            background-color: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-900 min-h-screen">
+
+    <nav class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 text-indigo-600 font-black tracking-tighter text-xl">
+                MODI PLATFORM
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="create.html" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-sm">새 과정안 작성</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-12">
+        <header class="mb-12">
+            <h1 class="text-4xl font-black mb-4">학습 자료 갤러리</h1>
+            <p class="text-slate-500">전체 학년의 MODI 교수학습과정안 및 프로젝트 자료를 탐색하세요.</p>
+        </header>
+
+        <!-- Filters -->
+        <div class="flex flex-wrap gap-3 mb-8 border-b border-slate-100 pb-6">
+            <button onclick="filterType('all')" class="filter-btn active px-4 py-1.5 rounded-full border border-slate-200 text-sm font-medium transition-all" id="btn-all">전체</button>
+            <button onclick="filterType('lesson')" class="filter-btn px-4 py-1.5 rounded-full border border-slate-200 text-sm font-medium transition-all" id="btn-lesson">일반 과정안</button>
+            <button onclick="filterType('project')" class="filter-btn px-4 py-1.5 rounded-full border border-slate-200 text-sm font-medium transition-all" id="btn-project">프로젝트</button>
+            <div class="w-px h-6 bg-slate-200 mx-2 self-center"></div>
+            <select id="grade-filter" onchange="renderGallery()" class="px-4 py-1.5 rounded-full border border-slate-200 text-sm font-medium bg-white">
+                <option value="all">모든 학년</option>
+                <option value="1학년">1학년</option>
+                <option value="2학년">2학년</option>
+                <option value="3학년">3학년</option>
+                <option value="4학년">4학년</option>
+                <option value="5학년">5학년</option>
+                <option value="6학년">6학년</option>
+            </select>
+        </div>
+
+        <!-- Grid -->
+        <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Cards will be injected here -->
+            <div class="col-span-full py-20 text-center text-slate-400">
+                <i class="fas fa-spinner fa-spin text-3xl mb-4"></i>
+                <p>자료를 불러오고 있습니다...</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/storage.js"></script>
+    <script>
+        window.onerror = function(msg, url, line) {
+            alert("오류 발생: " + msg + "\n위치: " + line);
+        };
+        const storage = window.platformStorageEngine;
+
+        let allPlans = [];
+        let currentFilter = 'all';
+
+        async function init() {
+            if (!storage) {
+                setTimeout(init, 100);
+                return;
+            }
+            allPlans = await storage.getAllPlans();
+            renderGallery();
+        }
+
+        window.filterType = (type) => {
+            currentFilter = type;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            const btn = document.getElementById(`btn-${type}`);
+            if (btn) btn.classList.add('active');
+            renderGallery();
+        };
+
+        window.renderGallery = () => {
+            const gradeFilter = document.getElementById('grade-filter').value;
+            const grid = document.getElementById('gallery-grid');
+            
+            const filtered = allPlans.filter(plan => {
+                const typeMatch = currentFilter === 'all' || plan.type === currentFilter;
+                const gradeMatch = gradeFilter === 'all' || (plan.type === 'lesson' ? (plan.grade && plan.grade.includes(gradeFilter)) : (plan.meta && plan.meta.target && plan.meta.target.includes(gradeFilter)));
+                return typeMatch && gradeMatch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-20 text-center border-2 border-dashed border-slate-100 rounded-3xl">
+                        <p class="text-slate-400 font-medium">검색 결과가 없습니다.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(plan => {
+                const isProject = plan.type === 'project';
+                const title = isProject ? (plan.meta ? plan.meta.title : '제목 없음') : `${plan.subject || '교과'}: ${plan.unit || '단원'}`;
+                const grade = isProject ? (plan.meta ? plan.meta.target : '-') : (plan.grade || '-');
+                const icon = isProject ? 'fa-project-diagram text-indigo-500' : 'fa-chalkboard-teacher text-blue-500';
+                const date = new Date(plan.updatedAt).toLocaleDateString('ko-KR');
+
+                return `
+                    <div class="notion-card border border-slate-200 rounded-2xl overflow-hidden shadow-sm transition-all" onclick="openPlan(${plan.id}, '${plan.type}')">
+                        <div class="h-32 bg-slate-50 flex items-center justify-center border-b border-slate-100">
+                            <i class="fas ${icon} text-4xl opacity-20"></i>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-500">
+                                    ${isProject ? 'PROJECT' : 'LESSON'}
+                                </span>
+                                <span class="text-[10px] font-bold text-indigo-600">${grade}</span>
+                            </div>
+                            <h3 class="font-bold text-slate-800 line-clamp-2 h-12 mb-4 leading-snug">${title || '제목 없음'}</h3>
+                            <div class="flex justify-between items-center text-[11px] text-slate-400">
+                                <span>${plan.teacher || '작성자 미상'}</span>
+                                <span>${date}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        window.openPlan = (id, type) => {
+            const url = type === 'lesson' ? `lesson_editor.html?id=${id}` : `project_editor.html?id=${id}`;
+            window.location.href = url;
+        };
+
+        init();
+    </script>
+</body>
+</html>

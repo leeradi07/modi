@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MODI 통합 플랫폼 | 관리자</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+    <div id="login-overlay" class="fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-sm w-full text-center">
+            <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-6">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h2 class="text-2xl font-black mb-2">관리자 인증</h2>
+            <p class="text-slate-500 mb-8 text-sm">플랫폼 관리를 위해 비밀번호를 입력하세요.</p>
+            <input type="password" id="admin-pw" class="w-full border border-slate-200 rounded-xl p-4 mb-4 text-center text-lg focus:ring-2 focus:ring-amber-500 outline-none" placeholder="비밀번호 입력">
+            <button onclick="checkAuth()" class="w-full bg-amber-500 text-white font-bold p-4 rounded-xl hover:bg-amber-600 transition-all">접속하기</button>
+            <p id="error-msg" class="text-red-500 text-xs mt-4 hidden">비밀번호가 올바르지 않습니다.</p>
+        </div>
+    </div>
+
+    <nav class="bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="index.html" class="text-indigo-600 font-black text-xl tracking-tighter">MODI PLATFORM <span class="text-slate-400 font-medium ml-2 text-sm uppercase">Admin</span></a>
+            <button onclick="logout()" class="text-slate-400 text-sm hover:text-red-500">로그아웃</button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-12">
+        <div class="flex justify-between items-end mb-8">
+            <div>
+                <h1 class="text-3xl font-black mb-2">데이터베이스 관리</h1>
+                <p class="text-slate-500">저장된 모든 학습 자료를 관리하고 백업할 수 있습니다.</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="exportDB()" class="bg-emerald-100 text-emerald-700 px-4 py-2 rounded-lg font-bold text-sm hover:bg-emerald-200">전체 백업 (.json)</button>
+                <button onclick="clearDB()" class="bg-red-100 text-red-700 px-4 py-2 rounded-lg font-bold text-sm hover:bg-red-200">전체 삭제</button>
+            </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold">
+                    <tr>
+                        <th class="px-6 py-4">ID</th>
+                        <th class="px-6 py-4">유형</th>
+                        <th class="px-6 py-4">제목 / 주제</th>
+                        <th class="px-6 py-4">학년</th>
+                        <th class="px-6 py-4">작성일</th>
+                        <th class="px-6 py-4 text-right">관리</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-table-body">
+                    <!-- Rows will be injected here -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="js/storage.js"></script>
+    <script>
+        window.onerror = function(msg, url, line) {
+            alert("오류 발생: " + msg + "\n위치: " + line);
+        };
+        console.log('Gallery Script Start');
+        const storage = window.platformStorageEngine;
+
+        window.checkAuth = () => {
+            const pw = document.getElementById('admin-pw').value;
+            if (pw === 'modi2026') {
+                document.getElementById('login-overlay').classList.add('hidden');
+                sessionStorage.setItem('modi_admin', 'true');
+                loadAdminData();
+            } else {
+                document.getElementById('error-msg').classList.remove('hidden');
+            }
+        };
+
+        window.logout = () => {
+            sessionStorage.removeItem('modi_admin');
+            location.reload();
+        };
+
+        async function loadAdminData() {
+            if (!storage) {
+                setTimeout(loadAdminData, 100);
+                return;
+            }
+            const plans = await storage.getAllPlans();
+            const tbody = document.getElementById('admin-table-body');
+            
+            if (plans.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-20 text-center text-slate-400">데이터가 없습니다.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = plans.map(plan => {
+                const title = plan.type === 'project' ? (plan.meta ? plan.meta.title : '제목 없음') : plan.unit;
+                const grade = plan.type === 'project' ? (plan.meta ? plan.meta.target : '-') : plan.grade;
+                return `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50">
+                        <td class="px-6 py-4 text-slate-400 font-mono">${plan.id}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 rounded text-[10px] font-bold ${plan.type === 'project' ? 'bg-indigo-100 text-indigo-700' : 'bg-blue-100 text-blue-700'}">
+                                ${plan.type === 'project' ? '프로젝트' : '일반'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 font-bold text-slate-700">${title || '제목 없음'}</td>
+                        <td class="px-6 py-4">${grade}</td>
+                        <td class="px-6 py-4 text-slate-400 text-xs">${new Date(plan.createdAt).toLocaleDateString()}</td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="deletePlan(${plan.id})" class="text-red-400 hover:text-red-600 transition-colors">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.deletePlan = async (id) => {
+            if (confirm('정말로 이 자료를 삭제하시겠습니까? 복구할 수 없습니다.')) {
+                await storage.deletePlan(id);
+                loadAdminData();
+            }
+        };
+
+        window.exportDB = async () => {
+            const plans = await storage.getAllPlans();
+            const blob = new Blob([JSON.stringify(plans, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `modi_platform_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        };
+
+        window.clearDB = async () => {
+            if (confirm('위험! 모든 데이터를 영구적으로 삭제하시겠습니까?')) {
+                const plans = await storage.getAllPlans();
+                for (const p of plans) {
+                    await storage.deletePlan(p.id);
+                }
+                loadAdminData();
+            }
+        };
+
+        // Check session
+        if (sessionStorage.getItem('modi_admin') === 'true') {
+            document.getElementById('login-overlay').classList.add('hidden');
+            loadAdminData();
+        }
+    </script>
+</body>
+</html>

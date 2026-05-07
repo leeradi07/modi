@@ -3,36 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MODI 통합 플랫폼 | 홈</title>
+    <title>무정 MODI PROJECT | 홈</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Noto Sans KR', sans-serif; }
+
         .glass-card {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
-        .hero-gradient {
-            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
-        }
-        .nav-item:hover {
-            transform: translateY(-2px);
+        .card-hover:hover {
+            transform: translateY(-3px);
             transition: all 0.3s ease;
+        }
+
+        /* ── Hero Section ── */
+        .hero-section {
+            background: linear-gradient(135deg, #1a2e52 0%, #1e3f7a 50%, #1d4ed8 100%);
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* subtle background pattern */
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle at 20% 50%, rgba(99,102,241,0.15) 0%, transparent 60%),
+                              radial-gradient(circle at 80% 20%, rgba(59,130,246,0.12) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* ── Left: Fixed logo panel ── */
+        .logo-panel {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .logo-frame {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 1.25rem 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+
+        /* ── Right: Sliding text panel ── */
+        .text-slider {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            min-height: 220px;
+        }
+
+        .text-panel {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 0 0 2rem;
+            color: white;
+            opacity: 0;
+            transform: translateX(48px);
+            transition: opacity 0.55s ease, transform 0.55s ease;
+            pointer-events: none;
+        }
+        .text-panel.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+            position: relative;
+        }
+        .text-panel.exit-left {
+            opacity: 0;
+            transform: translateX(-48px);
+            position: absolute;
+        }
+
+        .panel-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 0.5rem;
+        }
+        .panel-title {
+            font-size: clamp(1.6rem, 3.5vw, 2.5rem);
+            font-weight: 900;
+            line-height: 1.15;
+            margin-bottom: 0.75rem;
+        }
+        .panel-desc {
+            font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+            line-height: 1.75;
+            color: rgba(255,255,255,0.8);
+            max-width: 420px;
+        }
+        .panel-desc strong { color: white; }
+
+        /* step accent bar */
+        .step-bar {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 999px;
+            padding: 0.3rem 0.9rem 0.3rem 0.4rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        .step-bar .step-dot {
+            width: 1.6rem; height: 1.6rem;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 900;
+        }
+
+        /* Dots */
+        .dot-nav {
+            position: absolute;
+            bottom: 1rem;
+            right: 1.5rem;
+            display: flex;
+            gap: 0.45rem;
+            z-index: 10;
+        }
+        .dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .dot.active {
+            background: white;
+            width: 20px;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
 
-    <!-- Navigation -->
+    <!-- Navigation (로고 없이 텍스트만) -->
     <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center gap-3">
-                    <img src="../modi(tp).png" alt="Logo" class="h-8 w-auto" onerror="this.src='https://placehold.co/40x40?text=M'">
-                    <span class="text-xl font-black text-indigo-600 tracking-tighter">MODI PLATFORM</span>
-                </div>
+            <div class="flex justify-between h-14 items-center">
+                <span class="text-lg font-black text-indigo-700 tracking-tighter">무정 MODI PROJECT</span>
                 <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
                     <a href="admin.html" class="hover:text-indigo-600 transition-colors flex items-center gap-1">
                         <i class="fas fa-lock text-[10px]"></i> 관리자
@@ -42,42 +175,116 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <main class="flex-grow">
-        <div class="hero-gradient py-20 px-4 text-white">
-            <div class="max-w-5xl mx-auto text-center">
-                <h1 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
-                    MODI 교수학습과정안을<br>한곳에서 관리하세요.
-                </h1>
-                <p class="text-lg md:text-xl text-indigo-100 mb-10 max-w-2xl mx-auto">
-                    작성부터 배포까지, 학교 현장에 최적화된 통합 플랫폼입니다.<br>
-                    보안이 강화된 관리 시스템과 아름다운 갤러리 레이아웃을 경험해 보세요.
-                </p>
-                <div class="flex flex-wrap justify-center gap-4">
-                    <a href="lesson_editor.html" class="bg-white text-indigo-600 px-8 py-4 rounded-2xl font-bold shadow-xl hover:bg-indigo-50 transition-all">
-                        과정안 작성하기
-                    </a>
-                    <a href="project_editor.html" class="bg-white text-indigo-600 px-8 py-4 rounded-2xl font-bold shadow-xl hover:bg-indigo-50 transition-all">
-                        프로젝트 작성하기
-                    </a>
-                    <a href="gallery.html" class="bg-indigo-500/20 text-white border border-indigo-400/30 px-8 py-4 rounded-2xl font-bold backdrop-blur-sm hover:bg-indigo-500/30 transition-all">
-                        갤러리 보기
-                    </a>
+    <!-- ── HERO: fixed logo + sliding text ── -->
+    <div class="hero-section px-6 md:px-12 py-10" id="heroSlider">
+        <div class="max-w-5xl mx-auto w-full flex flex-col md:flex-row items-center gap-8 md:gap-12 relative z-10">
+
+            <!-- LEFT: 고정 로고 패널 -->
+            <div class="logo-panel">
+                <div class="logo-frame">
+                    <img src="modi(tp).png" alt="MODI Logo"
+                         class="h-28 md:h-36 w-auto object-contain"
+                         onerror="this.outerHTML='<p class=\'text-white font-black text-5xl\'>MODI</p>'">
                 </div>
+
+
             </div>
+
+            <!-- RIGHT: 슬라이딩 텍스트 영역 -->
+            <div class="text-slider" id="textSlider">
+
+                <!-- Panel 0: 인트로 -->
+                <div class="text-panel active" id="panel-0">
+                    <p class="panel-label">무정 MODI PROJECT</p>
+                    <h1 class="panel-title">
+                        모두의 디지털 리터러시,<br>
+                        <span style="color:#93c5fd;">모두를 위한 디딤돌</span>
+                    </h1>
+                    <p class="panel-desc">
+                        MODI 프로젝트로 디지털 리터러시 교육을 실천합니다.
+                    </p>
+                </div>
+
+                <!-- Panel 1: M -->
+                <div class="text-panel" id="panel-1">
+                    <div class="step-bar">
+                        <span class="step-dot" style="background:#0284c7;color:white;">M</span>
+                        <span style="color:rgba(255,255,255,0.8);">1단계</span>
+                    </div>
+                    <h2 class="panel-title">Meet<span style="color:rgba(255,255,255,0.45);font-size:0.6em;"> · 만남</span></h2>
+                    <p class="panel-desc">
+                        학습 주제와 <strong>만나고</strong><br>
+                        디지털 학습과정을 <strong>준비</strong>하는 단계입니다.
+                    </p>
+                </div>
+
+                <!-- Panel 2: O -->
+                <div class="text-panel" id="panel-2">
+                    <div class="step-bar">
+                        <span class="step-dot" style="background:#0d9488;color:white;">O</span>
+                        <span style="color:rgba(255,255,255,0.8);">2단계</span>
+                    </div>
+                    <h2 class="panel-title">Observation<span style="color:rgba(255,255,255,0.45);font-size:0.6em;"> · 탐색</span></h2>
+                    <p class="panel-desc">
+                        데이터를 <strong>수집하고 분석</strong>하며<br>
+                        문제 해결 방안을 <strong>탐색</strong>하는 단계입니다.
+                    </p>
+                </div>
+
+                <!-- Panel 3: D -->
+                <div class="text-panel" id="panel-3">
+                    <div class="step-bar">
+                        <span class="step-dot" style="background:#7c3aed;color:white;">D</span>
+                        <span style="color:rgba(255,255,255,0.8);">3단계</span>
+                    </div>
+                    <h2 class="panel-title" style="font-size:clamp(1.2rem,2.8vw,2rem);">Design &amp; Development<span style="color:rgba(255,255,255,0.45);font-size:0.6em;"> · 문제해결</span></h2>
+                    <p class="panel-desc">
+                        학습 문제를 <strong>해결</strong>하고<br>
+                        창의적 <strong>산출물을 개발</strong>하는 단계입니다.
+                    </p>
+                </div>
+
+                <!-- Panel 4: I -->
+                <div class="text-panel" id="panel-4">
+                    <div class="step-bar">
+                        <span class="step-dot" style="background:#4f46e5;color:white;">I</span>
+                        <span style="color:rgba(255,255,255,0.8);">4단계</span>
+                    </div>
+                    <h2 class="panel-title" style="font-size:clamp(1.2rem,2.8vw,2rem);">Interaction &amp; Innovation<span style="color:rgba(255,255,255,0.45);font-size:0.6em;"> · 소통과 혁신</span></h2>
+                    <p class="panel-desc">
+                        배움을 <strong>공유</strong>하고<br>
+                        새로운 아이디어로 <strong>성장</strong>시키는 단계입니다.
+                    </p>
+                </div>
+
+            </div><!-- /text-slider -->
+        </div><!-- /max-w -->
+
+        <!-- Dot nav -->
+        <div class="dot-nav" id="dotNav">
+            <div class="dot active" onclick="goTo(0)"></div>
+            <div class="dot" onclick="goTo(1)"></div>
+            <div class="dot" onclick="goTo(2)"></div>
+            <div class="dot" onclick="goTo(3)"></div>
+            <div class="dot" onclick="goTo(4)"></div>
         </div>
 
-        <!-- Features -->
+    </div><!-- /hero-section -->
+
+
+
+    <!-- Features -->
+    <main class="flex-grow">
         <div class="max-w-7xl mx-auto px-4 py-20">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Lesson Plan -->
-                <a href="lesson_editor.html" class="glass-card p-8 rounded-3xl shadow-sm border border-slate-100 nav-item group block">
+                <a href="lesson_editor.html" class="glass-card p-8 rounded-3xl shadow-sm border border-slate-100 card-hover group block">
                     <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all">
                         <i class="fas fa-chalkboard-teacher"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-3">교수학습과정안</h3>
                     <p class="text-slate-500 mb-6 leading-relaxed">
-                        단일 차시 수업을 위한 표준 과정안입니다. MODI 4단계(M-O-D-I)와 평가 계획이 포함됩니다.
+                        교과 연계 디지털 리터러시 교육을 위한 교수학습과정안입니다. MODI 4단계와 평가 계획이 포함됩니다.
                     </p>
                     <span class="text-blue-600 font-bold flex items-center gap-2 group-hover:gap-3 transition-all">
                         작성하기 <i class="fas fa-arrow-right"></i>
@@ -85,13 +292,13 @@
                 </a>
 
                 <!-- Project Plan -->
-                <a href="project_editor.html" class="glass-card p-8 rounded-3xl shadow-sm border border-slate-100 nav-item group block">
+                <a href="project_editor.html" class="glass-card p-8 rounded-3xl shadow-sm border border-slate-100 card-hover group block">
                     <div class="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-all">
                         <i class="fas fa-project-diagram"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-3">창의적 체험활동 프로젝트</h3>
                     <p class="text-slate-500 mb-6 leading-relaxed">
-                        다차시로 구성된 프로젝트 수업을 위한 과정안입니다. 전체 흐름도와 차시별 주요 활동을 관리합니다.
+                        다차시로 구성된 창의적 체험활동 프로젝트입니다. 전체 흐름과 차시별 주요 내용을 안내합니다.
                     </p>
                     <span class="text-indigo-600 font-bold flex items-center gap-2 group-hover:gap-3 transition-all">
                         작성하기 <i class="fas fa-arrow-right"></i>
@@ -99,13 +306,13 @@
                 </a>
 
                 <!-- Gallery -->
-                <a href="gallery.html" class="glass-card p-8 rounded-3xl shadow-sm border border-slate-100 nav-item group block">
+                <a href="gallery.html" class="glass-card p-8 rounded-3xl shadow-sm border border-slate-100 card-hover group block">
                     <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-all">
                         <i class="fas fa-th-large"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-3">갤러리</h3>
                     <p class="text-slate-500 mb-6 leading-relaxed">
-                        작성된 결과물을 노션 스타일의 세련된 갤러리로 제공합니다. 학년, 교과별 필터로 필요한 자료를 즉시 찾을 수 있습니다.
+                        교과별 교수학습과정안과 창의적 체험활동 프로젝트를 게시합니다.
                     </p>
                     <span class="text-emerald-600 font-bold flex items-center gap-2 group-hover:gap-3 transition-all">
                         구경하기 <i class="fas fa-arrow-right"></i>
@@ -116,13 +323,59 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 py-12">
+    <footer class="bg-white border-t border-slate-200 py-10">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <p class="text-slate-400 text-sm">
-                &copy; 2026 MODI Lesson Plan Platform. All rights reserved.
+                &copy; 2026 무정 MODI PROJECT. All rights reserved.
             </p>
         </div>
     </footer>
+
+    <script>
+        // ── Slider config ──
+        const TOTAL    = 5;
+        const INTERVAL = 4500; // ms
+
+        let current = 0;
+        let timer   = null;
+
+        function getPanel(i) { return document.getElementById('panel-' + i); }
+        function getDot(i)   { return document.querySelectorAll('.dot')[i]; }
+
+        function goTo(next) {
+            const prev = current;
+            if (prev === next) return;
+
+            // exit prev panel
+            getPanel(prev).classList.remove('active');
+            getPanel(prev).classList.add('exit-left');
+            getDot(prev).classList.remove('active');
+
+            // show next panel
+            getPanel(next).classList.remove('exit-left');
+            getPanel(next).classList.add('active');
+            getDot(next).classList.add('active');
+
+            // cleanup
+            setTimeout(() => getPanel(prev).classList.remove('exit-left'), 600);
+
+            current = next;
+            resetTimer();
+        }
+
+        function nextSlide() {
+            goTo((current + 1) % TOTAL);
+        }
+
+        function resetTimer() {
+            if (timer) clearInterval(timer);
+            timer = setInterval(nextSlide, INTERVAL);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            resetTimer();
+        });
+    </script>
 
 </body>
 </html>

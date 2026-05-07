@@ -115,22 +115,40 @@
                 return;
             }
 
+            const subjectStyles = {
+                '국어': { icon: 'fa-book', color: 'orange' },
+                '수학': { icon: 'fa-calculator', color: 'blue' },
+                '사회': { icon: 'fa-globe-asia', color: 'yellow' },
+                '과학': { icon: 'fa-flask', color: 'emerald' },
+                '도덕': { icon: 'fa-heart', color: 'rose' },
+                '체육': { icon: 'fa-running', color: 'red' },
+                '음악': { icon: 'fa-music', color: 'purple' },
+                '미술': { icon: 'fa-palette', color: 'pink' },
+                '실과': { icon: 'fa-tools', color: 'amber' },
+                '영어': { icon: 'fa-language', color: 'cyan' }
+            };
+
             grid.innerHTML = filtered.map(plan => {
                 const isProject = plan.type === 'project';
+                const subject = isProject ? '창의적 체험활동' : (plan.subject || '교과');
+                const style = subjectStyles[subject] || (isProject ? { icon: 'fa-project-diagram', color: 'indigo' } : { icon: 'fa-chalkboard-teacher', color: 'slate' });
+                
                 const title = isProject
                     ? (plan.meta ? plan.meta.title : '제목 없음')
                     : `${plan.subject || '교과'}: ${plan.unit || '단원'}`;
                 const grade = isProject
                     ? (plan.meta ? plan.meta.target : '-')
                     : (plan.grade || '-');
-                const icon = isProject ? 'fa-project-diagram text-indigo-500' : 'fa-chalkboard-teacher text-blue-500';
+                
+                const iconClass = `fas ${style.icon} text-${style.color}-500`;
+                const cardBgClass = `bg-${style.color}-50`;
                 const typeLabel = isProject ? '창의적 체험활동' : '교과';
                 const typeBg = isProject ? 'bg-indigo-100 text-indigo-700' : 'bg-blue-100 text-blue-700';
 
                 return `
                     <div class="notion-card border border-slate-200 rounded-2xl overflow-hidden shadow-sm transition-all" onclick="openPlan(${plan.id}, '${plan.type}')">
-                        <div class="h-32 bg-slate-50 flex items-center justify-center border-b border-slate-100">
-                            <i class="fas ${icon} text-4xl opacity-20"></i>
+                        <div class="h-32 ${cardBgClass} flex items-center justify-center border-b border-slate-100">
+                            <i class="${iconClass} text-4xl opacity-40"></i>
                         </div>
                         <div class="p-5">
                             <div class="flex items-center gap-2 mb-3">

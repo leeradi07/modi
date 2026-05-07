@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MODI 교수학습과정안</title>
+    <title>교과 교수학습과정안</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="js/data.js"></script>
@@ -213,7 +213,7 @@
         <header class="bg-blue-600 text-white shadow-md p-4 no-print flex-shrink-0 z-50">
         <div class="max-w-[1600px] mx-auto flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-bold"><i class="fas fa-edit mr-2"></i>MODI 교수학습과정안</h1>
+                <h1 class="text-2xl font-bold"><i class="fas fa-edit mr-2"></i>교과 교수학습과정안</h1>
             </div>
             <div class="flex gap-3">
                 <button onclick="saveData()" class="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded-lg font-bold shadow flex items-center transition-colors text-sm">
@@ -1689,6 +1689,20 @@
             syncEvalMethodSelect('sub');
             syncEvalMethodSelect('dl');
             triggerLoadSubjectStandards();
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('preview') === '1') {
+                const editor = document.getElementById('editor_section');
+                const preview = document.getElementById('preview_section');
+                if (editor) editor.classList.add('hidden');
+                if (preview) {
+                    preview.classList.remove('lg:w-[55%]');
+                    preview.classList.add('w-full');
+                }
+                document.querySelectorAll('header button, header label').forEach(el => {
+                    const onclickStr = el.getAttribute('onclick') || '';
+                    if (!onclickStr.includes('printPage')) el.classList.add('hidden');
+                });
+            }
             updateView();
         });
     </script>

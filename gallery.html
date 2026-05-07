@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MODI 통합 플랫폼 | 갤러리</title>
+    <title>무정 MODI PROJECT | 갤러리</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -24,11 +24,13 @@
 
     <nav class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            <a href="index.html" class="flex items-center gap-2 text-indigo-600 font-black tracking-tighter text-xl">
-                MODI PLATFORM
+            <a href="index.html" class="flex items-center gap-2 text-indigo-700 font-black tracking-tighter text-xl">
+                무정 MODI PROJECT
             </a>
             <div class="flex items-center gap-4">
-                <a href="create.html" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-sm">새 과정안 작성</a>
+                <a href="admin.html" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition-colors">
+                    <i class="fas fa-lock text-xs"></i> 관리자 모드
+                </a>
             </div>
         </div>
     </nav>
@@ -36,14 +38,14 @@
     <main class="max-w-7xl mx-auto px-4 py-12">
         <header class="mb-12">
             <h1 class="text-4xl font-black mb-4">학습 자료 갤러리</h1>
-            <p class="text-slate-500">전체 학년의 MODI 교수학습과정안 및 프로젝트 자료를 탐색하세요.</p>
+            <p class="text-slate-500">교과별 교수학습과정안과 창의적 체험활동 프로젝트를 탐색하세요.</p>
         </header>
 
         <!-- Filters -->
         <div class="flex flex-wrap gap-3 mb-8 border-b border-slate-100 pb-6">
             <button onclick="filterType('all')" class="filter-btn active px-4 py-1.5 rounded-full border border-slate-200 text-sm font-medium transition-all" id="btn-all">전체</button>
-            <button onclick="filterType('lesson')" class="filter-btn px-4 py-1.5 rounded-full border border-slate-200 text-sm font-medium transition-all" id="btn-lesson">일반 과정안</button>
-            <button onclick="filterType('project')" class="filter-btn px-4 py-1.5 rounded-full border border-slate-200 text-sm font-medium transition-all" id="btn-project">프로젝트</button>
+            <button onclick="filterType('lesson')" class="filter-btn px-4 py-1.5 rounded-full border border-slate-200 text-sm font-medium transition-all" id="btn-lesson">교과</button>
+            <button onclick="filterType('project')" class="filter-btn px-4 py-1.5 rounded-full border border-slate-200 text-sm font-medium transition-all" id="btn-project">창의적 체험활동</button>
             <div class="w-px h-6 bg-slate-200 mx-2 self-center"></div>
             <select id="grade-filter" onchange="renderGallery()" class="px-4 py-1.5 rounded-full border border-slate-200 text-sm font-medium bg-white">
                 <option value="all">모든 학년</option>
@@ -58,7 +60,6 @@
 
         <!-- Grid -->
         <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Cards will be injected here -->
             <div class="col-span-full py-20 text-center text-slate-400">
                 <i class="fas fa-spinner fa-spin text-3xl mb-4"></i>
                 <p>자료를 불러오고 있습니다...</p>
@@ -96,10 +97,12 @@
         window.renderGallery = () => {
             const gradeFilter = document.getElementById('grade-filter').value;
             const grid = document.getElementById('gallery-grid');
-            
+
             const filtered = allPlans.filter(plan => {
                 const typeMatch = currentFilter === 'all' || plan.type === currentFilter;
-                const gradeMatch = gradeFilter === 'all' || (plan.type === 'lesson' ? (plan.grade && plan.grade.includes(gradeFilter)) : (plan.meta && plan.meta.target && plan.meta.target.includes(gradeFilter)));
+                const gradeMatch = gradeFilter === 'all' || (plan.type === 'lesson'
+                    ? (plan.grade && plan.grade.includes(gradeFilter))
+                    : (plan.meta && plan.meta.target && plan.meta.target.includes(gradeFilter)));
                 return typeMatch && gradeMatch;
             });
 
@@ -114,10 +117,15 @@
 
             grid.innerHTML = filtered.map(plan => {
                 const isProject = plan.type === 'project';
-                const title = isProject ? (plan.meta ? plan.meta.title : '제목 없음') : `${plan.subject || '교과'}: ${plan.unit || '단원'}`;
-                const grade = isProject ? (plan.meta ? plan.meta.target : '-') : (plan.grade || '-');
+                const title = isProject
+                    ? (plan.meta ? plan.meta.title : '제목 없음')
+                    : `${plan.subject || '교과'}: ${plan.unit || '단원'}`;
+                const grade = isProject
+                    ? (plan.meta ? plan.meta.target : '-')
+                    : (plan.grade || '-');
                 const icon = isProject ? 'fa-project-diagram text-indigo-500' : 'fa-chalkboard-teacher text-blue-500';
-                const date = new Date(plan.updatedAt).toLocaleDateString('ko-KR');
+                const typeLabel = isProject ? '창의적 체험활동' : '교과';
+                const typeBg = isProject ? 'bg-indigo-100 text-indigo-700' : 'bg-blue-100 text-blue-700';
 
                 return `
                     <div class="notion-card border border-slate-200 rounded-2xl overflow-hidden shadow-sm transition-all" onclick="openPlan(${plan.id}, '${plan.type}')">
@@ -126,15 +134,14 @@
                         </div>
                         <div class="p-5">
                             <div class="flex items-center gap-2 mb-3">
-                                <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-500">
-                                    ${isProject ? 'PROJECT' : 'LESSON'}
+                                <span class="text-[10px] font-black tracking-wider px-2 py-0.5 rounded ${typeBg}">
+                                    ${typeLabel}
                                 </span>
                                 <span class="text-[10px] font-bold text-indigo-600">${grade}</span>
                             </div>
-                            <h3 class="font-bold text-slate-800 line-clamp-2 h-12 mb-4 leading-snug">${title || '제목 없음'}</h3>
-                            <div class="flex justify-between items-center text-[11px] text-slate-400">
+                            <h3 class="font-bold text-slate-800 line-clamp-2 h-12 mb-2 leading-snug">${title || '제목 없음'}</h3>
+                            <div class="text-[11px] text-slate-400">
                                 <span>${plan.teacher || '작성자 미상'}</span>
-                                <span>${date}</span>
                             </div>
                         </div>
                     </div>
@@ -142,8 +149,11 @@
             }).join('');
         };
 
+        // 갤러리에서는 미리보기 전용 모드로 열기 (preview=1 파라미터)
         window.openPlan = (id, type) => {
-            const url = type === 'lesson' ? `lesson_editor.html?id=${id}` : `project_editor.html?id=${id}`;
+            const url = type === 'lesson'
+                ? `lesson_editor.html?id=${id}&preview=1`
+                : `project_editor.html?id=${id}&preview=1`;
             window.location.href = url;
         };
 

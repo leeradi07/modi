@@ -1431,14 +1431,14 @@
             document.getElementById('view_eval_sub_high').innerText = data.eval_sub_high || '-';
             document.getElementById('view_eval_sub_mid').innerText = data.eval_sub_mid || '-';
             document.getElementById('view_eval_sub_low').innerText = data.eval_sub_low || '-';
-            document.getElementById('view_eval_sub_method').innerText = data.eval_sub_method || '-';
+            document.getElementById('view_eval_sub_method').innerText = data.eval_sub_method ? data.eval_sub_method.split(',').map(v => v.trim()).join('\n') : '-';
 
             document.getElementById('view_eval_dl_goal').innerText = data.eval_dl_goal || '-';
             document.getElementById('view_eval_dl_element').innerText = data.eval_dl_element || '-';
             document.getElementById('view_eval_dl_high').innerText = data.eval_dl_high || '-';
             document.getElementById('view_eval_dl_mid').innerText = data.eval_dl_mid || '-';
             document.getElementById('view_eval_dl_low').innerText = data.eval_dl_low || '-';
-            document.getElementById('view_eval_dl_method').innerText = data.eval_dl_method || '-';
+            document.getElementById('view_eval_dl_method').innerText = data.eval_dl_method ? data.eval_dl_method.split(',').map(v => v.trim()).join('\n') : '-';
 
             document.getElementById('view_learning_problem').innerText = data.learning_problem || '학습문제를 입력해주세요.';
 

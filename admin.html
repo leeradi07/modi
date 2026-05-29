@@ -49,11 +49,12 @@
             <table class="w-full text-left text-sm">
                 <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold">
                     <tr>
-                        <th class="px-6 py-4">ID</th>
-                        <th class="px-6 py-4">유형</th>
-                        <th class="px-6 py-4">제목 / 주제</th>
-                        <th class="px-6 py-4">학년</th>
-                        <th class="px-6 py-4">작성일</th>
+                        <th class="px-6 py-4 cursor-pointer hover:bg-slate-100 transition-colors select-none" onclick="sortPlans('teacher')">수업자 <i id="sort-icon-teacher" class="fas fa-sort ml-1 text-slate-300"></i></th>
+                        <th class="px-6 py-4 cursor-pointer hover:bg-slate-100 transition-colors select-none" onclick="sortPlans('type')">유형 <i id="sort-icon-type" class="fas fa-sort ml-1 text-slate-300"></i></th>
+                        <th class="px-6 py-4 cursor-pointer hover:bg-slate-100 transition-colors select-none" onclick="sortPlans('subject')">교과 <i id="sort-icon-subject" class="fas fa-sort ml-1 text-slate-300"></i></th>
+                        <th class="px-6 py-4 cursor-pointer hover:bg-slate-100 transition-colors select-none" onclick="sortPlans('title')">제목 / 주제 <i id="sort-icon-title" class="fas fa-sort ml-1 text-slate-300"></i></th>
+                        <th class="px-6 py-4 cursor-pointer hover:bg-slate-100 transition-colors select-none" onclick="sortPlans('grade')">학년 <i id="sort-icon-grade" class="fas fa-sort ml-1 text-slate-300"></i></th>
+                        <th class="px-6 py-4 cursor-pointer hover:bg-slate-100 transition-colors select-none" onclick="sortPlans('createdAt')">작성일 <i id="sort-icon-createdAt" class="fas fa-sort-down ml-1 text-indigo-500"></i></th>
                         <th class="px-6 py-4 text-right">관리</th>
                     </tr>
                 </thead>
@@ -88,30 +89,95 @@
             location.reload();
         };
 
+        let plansData = [];
+        let sortCol = 'createdAt';
+        let sortDesc = true;
+
         async function loadAdminData() {
             if (!storage) {
                 setTimeout(loadAdminData, 100);
                 return;
             }
-            const plans = await storage.getAllPlans();
+            plansData = await storage.getAllPlans();
+            renderTable();
+        }
+
+        window.sortPlans = (col) => {
+            if (sortCol === col) {
+                sortDesc = !sortDesc;
+            } else {
+                sortCol = col;
+                sortDesc = false;
+            }
+            renderTable();
+        };
+
+        function renderTable() {
             const tbody = document.getElementById('admin-table-body');
             
-            if (plans.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-20 text-center text-slate-400">데이터가 없습니다.</td></tr>';
+            if (plansData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-20 text-center text-slate-400">데이터가 없습니다.</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = plans.map(plan => {
+            const sorted = [...plansData].sort((a, b) => {
+                const titleA = a.type === 'project' ? (a.meta ? a.meta.title : '') : a.unit;
+                const titleB = b.type === 'project' ? (b.meta ? b.meta.title : '') : b.unit;
+                const gradeA = a.type === 'project' ? (a.meta ? a.meta.target : '') : a.grade;
+                const gradeB = b.type === 'project' ? (b.meta ? b.meta.target : '') : b.grade;
+                const subjectA = a.type === 'project' ? (a.meta && a.meta.subjects && a.meta.subjects.length ? a.meta.subjects.join(', ') : '창체') : (a.subject || '');
+                const subjectB = b.type === 'project' ? (b.meta && b.meta.subjects && b.meta.subjects.length ? b.meta.subjects.join(', ') : '창체') : (b.subject || '');
+                
+                let valA, valB;
+                switch(sortCol) {
+                    case 'teacher':
+                        valA = a.teacher || '';
+                        valB = b.teacher || '';
+                        break;
+                    case 'type':
+                        valA = a.type || '';
+                        valB = b.type || '';
+                        break;
+                    case 'subject':
+                        valA = subjectA;
+                        valB = subjectB;
+                        break;
+                    case 'title':
+                        valA = titleA || '';
+                        valB = titleB || '';
+                        break;
+                    case 'grade':
+                        valA = gradeA || '';
+                        valB = gradeB || '';
+                        break;
+                    case 'createdAt':
+                        valA = new Date(a.createdAt).getTime();
+                        valB = new Date(b.createdAt).getTime();
+                        break;
+                    default:
+                        valA = a.id;
+                        valB = b.id;
+                }
+
+                if (valA < valB) return sortDesc ? 1 : -1;
+                if (valA > valB) return sortDesc ? -1 : 1;
+                return 0;
+            });
+
+            tbody.innerHTML = sorted.map(plan => {
                 const title = plan.type === 'project' ? (plan.meta ? plan.meta.title : '제목 없음') : plan.unit;
                 const grade = plan.type === 'project' ? (plan.meta ? plan.meta.target : '-') : plan.grade;
+                const subject = plan.type === 'project' ? (plan.meta && plan.meta.subjects && plan.meta.subjects.length ? plan.meta.subjects.join(', ') : '창체') : (plan.subject || '-');
+
                 return `
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
-                        <td class="px-6 py-4 text-slate-400 font-mono">${plan.id}</td>
+                        <td class="px-6 py-4 text-slate-600 font-bold">${plan.teacher || '-'}</td>
                         <td class="px-6 py-4">
                             <span class="px-2 py-1 rounded text-[10px] font-bold ${plan.type === 'project' ? 'bg-indigo-100 text-indigo-700' : 'bg-blue-100 text-blue-700'}">
                                 ${plan.type === 'project' ? '창의적 체험활동' : '교과'}
                             </span>
                         </td>
+                        <td class="px-6 py-4">${subject}</td>
                         <td class="px-6 py-4 font-bold text-slate-700 cursor-pointer hover:text-indigo-600" onclick="window.open('${plan.type === 'project' ? 'project_editor.html' : 'lesson_editor.html'}?id=${plan.id}')">${title || '제목 없음'}</td>
                         <td class="px-6 py-4">${grade}</td>
                         <td class="px-6 py-4 text-slate-400 text-xs">${new Date(plan.createdAt).toLocaleDateString()}</td>
@@ -126,6 +192,18 @@
                     </tr>
                 `;
             }).join('');
+
+            const cols = ['teacher', 'type', 'subject', 'title', 'grade', 'createdAt'];
+            cols.forEach(col => {
+                const el = document.getElementById('sort-icon-' + col);
+                if (el) {
+                    if (sortCol === col) {
+                        el.className = sortDesc ? 'fas fa-sort-down ml-1 text-indigo-500' : 'fas fa-sort-up ml-1 text-indigo-500';
+                    } else {
+                        el.className = 'fas fa-sort ml-1 text-slate-300';
+                    }
+                }
+            });
         }
 
         window.deletePlan = async (id) => {

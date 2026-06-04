@@ -1534,10 +1534,26 @@
                 }
             });
 
+            // PDF 파일명(문서 제목) 동적 생성
+            const originalTitle = document.title;
+            try {
+                const data = getFormData();
+                const gradeStr = document.getElementById('input_grade_select') ? document.getElementById('input_grade_select').value : '5학년';
+                const semStr = document.getElementById('input_semester_select') ? document.getElementById('input_semester_select').value : '1학기';
+                const subjStr = data.subject || '교과';
+                const unitStr = data.unit ? data.unit.replace(/[^a-zA-Z0-9가-힣\s\(\)\.\-]/g, '_') : '단원명';
+                const teacherStr = data.teacher || '수업자';
+                
+                document.title = `${gradeStr}${semStr}_${subjStr}(${unitStr})_${teacherStr}`;
+            } catch (e) {
+                console.error("파일명 생성 오류", e);
+            }
+
             // Print
             window.print();
 
             // Restore
+            document.title = originalTitle;
             allPages.forEach(p => {
                 p.removeAttribute('data-print-hide');
                 const scaler = p.querySelector('.page-scaler');

@@ -1678,6 +1678,22 @@
 
                 syncEvalMethodSelect('sub');
                 syncEvalMethodSelect('dl');
+                
+                if (typeof triggerLoadSubjectStandards === 'function') {
+                    triggerLoadSubjectStandards().then(() => {
+                        if (data.subject_standard) {
+                            const stdSelect = document.getElementById('input_subject_standard_select');
+                            if (stdSelect && !Array.from(stdSelect.options).find(o => o.value === data.subject_standard)) {
+                                const opt = document.createElement('option');
+                                opt.value = opt.textContent = data.subject_standard;
+                                stdSelect.appendChild(opt);
+                            }
+                            if (stdSelect) stdSelect.value = data.subject_standard;
+                            handleSubjectStandard();
+                        }
+                    });
+                }
+                
                 updateView();
             } catch (err) {
                 console.error('Data injection failed', err);

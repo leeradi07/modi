@@ -11,9 +11,15 @@ const firebaseConfig = {
 const dbPromise = (async function() {
     try {
         const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js");
-        const { getFirestore } = await import("https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js");
+        const { initializeFirestore } = await import("https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js");
         const app = initializeApp(firebaseConfig);
-        return getFirestore(app);
+        // 이 망에서는 Firestore 기본 전송(fetch 스트리밍)이 차단되어 SDK가
+        // 'client is offline' 상태로 빠지고, 빈 캐시를 정상 응답처럼 돌려줍니다.
+        // long polling + XHR 로 고정해야 서버 데이터를 읽습니다.
+        return initializeFirestore(app, {
+            experimentalForceLongPolling: true,
+            useFetchStreams: false
+        });
     } catch (e) {
         console.error("Firebase init error:", e);
         throw e;

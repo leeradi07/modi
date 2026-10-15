@@ -1206,6 +1206,10 @@
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
+                    if (Array.isArray(data)) {
+                        alert('선택하신 파일은 관리자 모드에서 다운로드한 [전체 백업 파일]입니다.\n\n개별 수업 과정안 파일이 아니므로 에디터에서 직접 불러올 수 없습니다.\n관리자 모드의 [백업 복원] 기능을 이용하시거나, 갤러리 목록에서 해당 수업을 클릭하여 열어주세요.');
+                        return;
+                    }
                     
                     document.getElementById('input_subject').value = data.subject || '국어';
                     
